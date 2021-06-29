@@ -11,7 +11,8 @@ import {
   makeStyles,
   IconButton,
   Select,
-  InputLabel 
+  InputLabel,
+  MenuItem 
 } from "@material-ui/core";
 import CloseIcon from "mdi-material-ui/Close";
 import PlusIcon from "mdi-material-ui/Plus";
