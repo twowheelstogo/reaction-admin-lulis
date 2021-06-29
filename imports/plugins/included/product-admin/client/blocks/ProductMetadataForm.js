@@ -9,7 +9,9 @@ import {
   Button,
   Box,
   makeStyles,
-  IconButton
+  IconButton,
+  Select,
+  InputLabel 
 } from "@material-ui/core";
 import CloseIcon from "mdi-material-ui/Close";
 import PlusIcon from "mdi-material-ui/Plus";
@@ -18,6 +20,7 @@ import SimpleSchema from "simpl-schema";
 import clone from "clone";
 import equal from "deep-equal";
 import useProduct from "../hooks/useProduct";
+import _services from '../services';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -73,10 +76,11 @@ function ProductMetadataForm() {
   const classes = useStyles();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setDirty] = useState(false);
-  const [metafields, setMetafields] = useState([]);
+  const [metafields, setMetafields] = useState([{key:"odo-key", value:"not-value"}]);
   const [newMetafield, setNewMetafield] = useState({ key: "", value: "" });
   const [metafieldErrors, setMetafieldErrors] = useState([]);
   const [newMetafieldErrors, setNewMetafieldErrors] = useState({});
+  const { odooProducts } = _services.OdooService.useFetch();
 
   const {
     onUpdateProduct,
@@ -157,7 +161,7 @@ function ProductMetadataForm() {
 
   useEffect(() => {
     if (product) {
-      setMetafields(clone(product.metafields) || []);
+      setMetafields(clone(product.metafields) || [{key:"odo-key", value:"not-value"}]);
     }
   }, [
     product
@@ -178,63 +182,80 @@ function ProductMetadataForm() {
     <Card>
       <CardHeader title={i18next.t("admin.productAdmin.metadata")} />
       <CardContent>
-        <Grid
-          className={classes.grid}
-          container
-          spacing={2}
-        >
-          {Array.isArray(metafields) && metafields.map((metafield, index) => (
-            <Fragment key={`metafield-${index}`}>
-              <Grid
-                item
-                sm={3}
-              >
-                <TextField
-                  error={metafieldErrors[index] && metafieldErrors[index].key}
-                  fullWidth
-                  helperText={metafieldErrors[index] && metafieldErrors[index].key}
-                  placeholder={i18next.t("productDetailEdit.metafieldKey")}
-                  onChange={(event) => {
-                    setMetafields((prevState) => {
-                      const nextState = [...prevState];
-                      nextState[index].key = event.currentTarget.value;
-                      return nextState;
-                    });
-                  }}
-                  value={metafield.key}
-                />
-              </Grid>
+        <Grid className={classes.grid} container spacing={2}>
+          <Fragment>
+            <Grid item sm={3}>
+              <TextField
+                label=""
+                defaultValue="Producto de odoo"
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </Grid>
+            <Grid item sm={8}>
+              <InputLabel id="odoo-key-label">Producto en odoo</InputLabel>
+              <Select 
+              labelId="odoo-key-label" id="odo-key" value="not-value" onChange={(event) => {
+                setMetafields((prevState) => {
+                  const nextState = [...prevState];
+                  nextState[0].key = "odo-key";
+                  nextState[0].value = event.target.value;
+                  return nextState;
+                });
+              }}>
+                {Array.isArray(odooProducts) &&
+                 odooProducts.map((product, index)=><MenuItem
+                 key={`odooProduct-${index}`} 
+                 value={product.key}>{product.value}</MenuItem>)
+                } 
+              </Select>
+            </Grid>
+          </Fragment>
+          {Array.isArray(metafields) &&
+            metafields.map((metafield, index) => (
+              <Fragment key={`metafield-${index}`}>
+                <Grid item sm={3}>
+                  <TextField
+                    error={metafieldErrors[index] && metafieldErrors[index].key}
+                    fullWidth
+                    helperText={metafieldErrors[index] && metafieldErrors[index].key}
+                    placeholder={i18next.t("productDetailEdit.metafieldKey")}
+                    onChange={(event) => {
+                      setMetafields((prevState) => {
+                        const nextState = [...prevState];
+                        nextState[index+1].key = event.currentTarget.value;
+                        return nextState;
+                      });
+                    }}
+                    value={metafield.key}
+                  />
+                </Grid>
 
-              <Grid
-                item
-                sm={8}
-              >
-                <TextField
-                  error={metafieldErrors[index] && metafieldErrors[index].value}
-                  fullWidth
-                  helperText={metafieldErrors[index] && metafieldErrors[index].value}
-                  onChange={(event) => {
-                    setMetafields((prevState) => {
-                      const nextState = [...prevState];
-                      nextState[index].value = event.currentTarget.value;
-                      return nextState;
-                    });
-                  }}
-                  placeholder={i18next.t("productDetailEdit.metafieldValue")}
-                  value={metafield.value}
-                />
-              </Grid>
+                <Grid item sm={8}>
+                  <TextField
+                    error={metafieldErrors[index] && metafieldErrors[index].value}
+                    fullWidth
+                    helperText={metafieldErrors[index] && metafieldErrors[index].value}
+                    onChange={(event) => {
+                      setMetafields((prevState) => {
+                        const nextState = [...prevState];
+                        nextState[index+1].value = event.currentTarget.value;
+                        return nextState;
+                      });
+                    }}
+                    placeholder={i18next.t("productDetailEdit.metafieldValue")}
+                    value={metafield.value}
+                  />
+                </Grid>
 
-              <Grid
-                item
-                sm={1}
-              >
-                <IconButton onClick={() => removeMetafield(index)}>
-                  <CloseIcon />
-                </IconButton>
-              </Grid>
-            </Fragment>
-          ))}
+                <Grid item sm={1}>
+                  <IconButton onClick={() => removeMetafield(index+1)}>
+                    <CloseIcon />
+                  </IconButton>
+                </Grid>
+              </Fragment>
+            ))}
 
           <Grid item sm={3}>
             <TextField

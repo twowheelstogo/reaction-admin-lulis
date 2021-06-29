@@ -143,6 +143,7 @@
     "@babel/preset-env": "7.4.5",
     "@babel/preset-react": "7.0.0",
     "@reactioncommerce/eslint-config": "^2.1.0",
+    "axios": "^0.21.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.3",
     "babel-jest": "^24.8.0",
