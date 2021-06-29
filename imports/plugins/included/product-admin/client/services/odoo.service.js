@@ -7,7 +7,7 @@ export default {
             key:"not-value"
         }]);
 
-        const _fetchProducts = async () =>{
+        const fetchProducts = async () =>{
             try{
                 const res= await Axios.get(`${process.env.ODOO_HOST}/products`);
                 setOdooProduct( res.data );
@@ -15,7 +15,7 @@ export default {
         }
 
         useEffect(()=>{
-            _fetchProducts();
+            fetchProducts();
         },[])
         return {odooProduct};
     },
