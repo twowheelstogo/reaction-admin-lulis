@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react';
 
 export default {
     useFetch: () =>{
-        const [odooProducts, setOdooProduct] = useState([{
+        const [odooProducts, setOdooProducts] = useState([{
             value:"Select Value",
             key:"not-value"
         }]);
@@ -10,14 +10,14 @@ export default {
         const fetchProducts = async () =>{
             try{
                 const res= await Axios.get(`${process.env.ODOO_HOST}/products`);
-                setOdooProduct( res.data );
+                setOdooProducts( res.data );
             }catch(err){}
         }
 
         useEffect(()=>{
             fetchProducts();
         },[])
-        return {odooProduct};
+        return {odooProducts};
     },
 
 }
