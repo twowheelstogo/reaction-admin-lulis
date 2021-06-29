@@ -77,12 +77,14 @@ function ProductMetadataForm() {
   const classes = useStyles();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDirty, setDirty] = useState(false);
-  const [metafields, setMetafields] = useState([{key:"odo-key", value:"not-value"}]);
+  const [metafields, setMetafields] = useState([]);
   const [newMetafield, setNewMetafield] = useState({ key: "", value: "" });
   const [metafieldErrors, setMetafieldErrors] = useState([]);
   const [newMetafieldErrors, setNewMetafieldErrors] = useState({});
   const { odooProducts } = _services.OdooService.useFetch();
-
+  const [odooMetafield, setOdooMetafield] = useState({ key: "not-value", value: "Sin valor" });
+  const [previewOdooMetafield, setPreviewOdooMetafield] = useState({ key: "not-value", value: "Sin valor" });
+  const [hasOdooMetafield, setHasOdooMetafield] = useState(false);
   const {
     onUpdateProduct,
     product
@@ -148,8 +150,12 @@ function ProductMetadataForm() {
     }
 
     // Cleanup input, and remove any extra fields that may linger from GQL
+    let tmpMetafields = clone(metafields);
+    tmpMetafields.push(odooMetafield);
+
+    setPreviewOdooMetafield(odooMetafield);
     const cleanedInput = formSchema.clean({
-      metafields
+      tmpMetafields
     });
 
     await onUpdateProduct({
@@ -162,14 +168,29 @@ function ProductMetadataForm() {
 
   useEffect(() => {
     if (product) {
-      setMetafields(clone(product.metafields) || [{key:"odo-key", value:"not-value"}]);
+      let tmpMetafields = clone(product.metafields);
+      if(tmpMetafields){
+        let indexMetafields = tmpMetafields.findIndex((x)=> x == "odo-key");
+        if(indexMetafields != -1){
+          setPreviewOdooMetafield(tmpMetafields.splice(indexName, 1)[0]);
+        }
+      }
+      setMetafields(tmpMetafields || []);
     }
   }, [
     product
   ]);
 
   useEffect(() => {
-    setDirty((product && !equal(product.metafields, metafields)));
+    if(odooMetafield.key != previewOdooMetafield.key){
+      setHasOdooMetafield(true);
+    }
+  }, [
+    odooMetafield
+  ]);
+  
+  useEffect(() => {
+    setDirty((product && (!equal(product.metafields, metafields) || hasOdooMetafield)));
   }, [
     product,
     metafields
@@ -195,13 +216,15 @@ function ProductMetadataForm() {
               />
             </Grid>
             <Grid item sm={8}>
-              <InputLabel id="odoo-key-label">Producto en odoo</InputLabel>
               <Select 
-              labelId="odoo-key-label" id="odo-key" value="not-value" onChange={(event) => {
-                setMetafields((prevState) => {
-                  const nextState = [...prevState];
-                  nextState[0].key = "odo-key";
-                  nextState[0].value = event.target.value;
+              id="odo-key" value={odooMetafield.value} onChange={(event) => {
+                if(!event){ return; }
+                if(!event.target) { return; }
+                if(!event.target.value) {return; }
+                setOdooMetafield((prevState) => {
+                  const nextState = {...prevState};
+                  nextState.key = "odo-key";
+                  nextState.value = event.target.value;
                   return nextState;
                 });
               }}>
@@ -223,9 +246,12 @@ function ProductMetadataForm() {
                     helperText={metafieldErrors[index] && metafieldErrors[index].key}
                     placeholder={i18next.t("productDetailEdit.metafieldKey")}
                     onChange={(event) => {
+                      if(!event){ return; }
+                      if(!event.currentTarget) { return; }
+                      if(!event.currentTarget.value) {return; }
                       setMetafields((prevState) => {
                         const nextState = [...prevState];
-                        nextState[index+1].key = event.currentTarget.value;
+                        nextState[index].key = event.currentTarget.value;
                         return nextState;
                       });
                     }}
@@ -239,9 +265,12 @@ function ProductMetadataForm() {
                     fullWidth
                     helperText={metafieldErrors[index] && metafieldErrors[index].value}
                     onChange={(event) => {
+                      if(!event){ return; }
+                      if(!event.currentTarget) { return; }
+                      if(!event.currentTarget.value) {return; }
                       setMetafields((prevState) => {
                         const nextState = [...prevState];
-                        nextState[index+1].value = event.currentTarget.value;
+                        nextState[index].value = event.currentTarget.value;
                         return nextState;
                       });
                     }}
@@ -251,7 +280,7 @@ function ProductMetadataForm() {
                 </Grid>
 
                 <Grid item sm={1}>
-                  <IconButton onClick={() => removeMetafield(index+1)}>
+                  <IconButton onClick={() => removeMetafield(index)}>
                     <CloseIcon />
                   </IconButton>
                 </Grid>

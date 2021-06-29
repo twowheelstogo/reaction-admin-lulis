@@ -3,7 +3,7 @@ import {useState, useEffect} from 'react';
 export default {
     useFetch: () =>{
         const [odooProducts, setOdooProducts] = useState([{
-            value:"Select Value",
+            value:"Sin valor",
             key:"not-value"
         }]);
 
