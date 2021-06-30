@@ -123,7 +123,8 @@ function ProductMetadataForm() {
 
   const submitForm = async () => {
     setIsSubmitting(true);
-
+    console.log("odooMetafield",odooMetafield);
+    console.log("metafields", metafields);
     const fieldErrors = [];
     let hasErrors = false;
 
@@ -155,9 +156,9 @@ function ProductMetadataForm() {
 
     setPreviewOdooMetafield(odooMetafield);
     const cleanedInput = formSchema.clean({
-      tmpMetafields
+      metafields: tmpMetafields
     });
-
+    console.log("cleanedInput", cleanedInput);
     await onUpdateProduct({
       product: cleanedInput
     });
