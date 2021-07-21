@@ -158,12 +158,17 @@ class OrderCardFulfillmentGroups extends Component {
 
     return null;
   }
-
+  printAddress=(address)=>{
+    return{
+      fullName:address.description,
+      address1:address.address,
+      address2:address.reference
+    }
+  }
   render() {
     const { classes, order } = this.props;
     const { fulfillmentGroups } = order;
     const totalGroupsCount = fulfillmentGroups.length;
-
     return fulfillmentGroups.map((fulfillmentGroup, index) => {
       const currentGroupCount = index + 1;
       const { data: { shippingAddress }, displayStatus, status } = fulfillmentGroup;
@@ -219,7 +224,7 @@ class OrderCardFulfillmentGroups extends Component {
                         <Typography paragraph variant="h4">
                           {i18next.t("order.shippingAddress", "Shipping address")}
                         </Typography>
-                        <Address address={shippingAddress} />
+                        <Address address={this.printAddress(shippingAddress)} />
                       </Grid>
                       <Grid item xs={12} md={12}>
                         <Typography paragraph variant="h4">

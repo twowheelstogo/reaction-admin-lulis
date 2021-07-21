@@ -93,7 +93,7 @@ function OrdersTable() {
     },
     {
       Header: i18next.t("admin.table.headers.customer"),
-      accessor: "payments[0].billingAddress.fullName"
+      accessor: "payments[0].billingAddress.descrption"
     },
     {
       accessor: "summary.total.displayAmount",

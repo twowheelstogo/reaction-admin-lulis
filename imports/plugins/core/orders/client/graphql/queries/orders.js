@@ -9,9 +9,6 @@ query ordersQuery($shopIds: [ID], $filters: OrderFilterInput, $first: Connection
       createdAt
       email
       payments {
-        billingAddress {
-          fullName
-        }
         status
       }
       fulfillmentGroups {

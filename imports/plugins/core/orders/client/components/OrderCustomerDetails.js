@@ -13,7 +13,7 @@ import Typography from "@material-ui/core/Typography";
  */
 function OrderCustomerDetails({ order }) {
   const { email, fulfillmentGroups } = order;
-  const { shippingAddress: { fullName, phone } } = fulfillmentGroups[0].data;
+  const { shippingAddress: { description } } = fulfillmentGroups[0].data;
 
   return (
     <Card>
@@ -24,12 +24,12 @@ function OrderCustomerDetails({ order }) {
         <Grid container spacing={3}>
           <Grid item xs={12} md={12}>
             <Typography variant="h4">
-              {fullName}
+              {description}
             </Typography>
           </Grid>
           <Grid item xs={12} md={12}>
-            <Typography variant="body1">{email}</Typography>
-            <Typography variant="body1">{phone}</Typography>
+            <Typography variant="body1">{description}</Typography>
+            <Typography variant="body1">{description}</Typography>
           </Grid>
         </Grid>
       </CardContent>
@@ -43,8 +43,7 @@ OrderCustomerDetails.propTypes = {
     fulfillmentGroups: PropTypes.arrayOf(PropTypes.shape({
       data: PropTypes.shape({
         shippingAddress: PropTypes.shape({
-          fullName: PropTypes.string,
-          phone: PropTypes.string
+          description: PropTypes.string
         })
       })
     }))

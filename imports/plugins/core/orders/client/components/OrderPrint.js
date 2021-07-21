@@ -51,7 +51,12 @@ function OrderPrint(props) {
   const classes = useStyles();
   const { fulfillmentGroups } = order;
   const orderDate = new Date(order.createdAt).toLocaleDateString("en-US");
-
+  const printAddress = address =>{
+    return{
+      fullName:address.description,
+      address1:address.address
+    }
+  }
   return (
     <Fragment>
       <Helmet title={`Order #${order.referenceId} printable invoice`} />
@@ -99,7 +104,7 @@ function OrderPrint(props) {
               <Grid container>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h2" paragraph>Shipping address</Typography>
-                  <Address address={fulfillmentGroups[0].data.shippingAddress} />
+                  <Address address={printAddress(fulfillmentGroups[0].data.shippingAddress)} />
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h2" paragraph>Billing address</Typography>
