@@ -16,8 +16,8 @@ services:
     # image: reactioncommerce/admin:3.0.0-beta.11
     # image: reactioncommerce/admin:3.0.0-beta.13
     image: luiscelano/reaction-admin-lulis:1.0.1
-    build:
-      context: .
+#     build:
+#       context: .
     env_file:
       - ./.env
     networks:
