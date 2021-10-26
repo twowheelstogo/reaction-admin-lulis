@@ -12,10 +12,11 @@ import Typography from "@material-ui/core/Typography";
  * @returns {React.Component} returns a React component
  */
 function OrderCustomerDetails({ order }) {
-  const { email, fulfillmentGroups, account } = order;
+  const { email, fulfillmentGroups, account, billing } = order;
   const { shippingAddress } = fulfillmentGroups[0]?.data || {};
   const { description, address, reference } = shippingAddress || {};
   const { name, phone } = account;
+  const { address: billingAddress, nit, city, country, customerName } = billing;
 
   return (
     <Card>
@@ -28,6 +29,16 @@ function OrderCustomerDetails({ order }) {
             <Typography variant="body1">Nombre: {name}</Typography>
             <Typography variant="body1">Tel: {phone}</Typography>
             <Typography variant="body1">correo: {email}</Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Typography variant="h4">
+              {"Datos de facturación"}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Typography variant="body1">Nit: {nit}</Typography>
+            <Typography variant="body1">Nombre de facturación: {customerName || "CF"}</Typography>
+            <Typography variant="body1">Dirección de facturación: {billingAddress},{country} ,{city}</Typography>
           </Grid>
           <Grid item xs={12} md={12}>
             <Typography variant="h4">

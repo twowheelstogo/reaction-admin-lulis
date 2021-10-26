@@ -216,6 +216,14 @@ export const orderCommonFragment = gql`
         displayAmount
       }
     }
+    billing {
+      customerName
+      nit
+      address
+      city
+      country
+      depto
+    }
     totalItemQuantity
     updatedAt
   }
