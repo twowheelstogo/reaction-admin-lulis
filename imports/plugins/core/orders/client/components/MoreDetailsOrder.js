@@ -72,10 +72,13 @@ function MoreDetailsOrder(props) {
         }
     };
 
-    const handleChange = (event) => handleChangeBillingDetails({
-        ...value,
-        [event.target.id]: event.target.value
-    });
+    const handleChange = (event) => {
+        event.persist();
+        handleChangeBillingDetails({
+            ...value,
+            [event.target.id]: event.target.value
+        });
+    };
 
     const handleKeyDown = (event) => {
         if (event.key === "Enter" || event.key === "Tab") {
@@ -83,14 +86,23 @@ function MoreDetailsOrder(props) {
         }
     }
 
-    const handleChangeGift = (event) => handleChangeGiftDetails(prev => ({
-        ...prev,
-        [event.target.id]: event.target.value
-    }));
+    const handleChangeGift = (event) => {
+        event.persist();
+        handleChangeGiftDetails(prev => ({
+            ...prev,
+            [event.target.id]: event.target.value
+        }));
+    };
 
-    const handleChangeNote = (event) => setNote(event.target.value);
+    const handleChangeNote = (event) => {
+        event.persist();
+        setNote(event.target.value);
+    };
 
-    const handleCheckboxChange = (event) => markAsWithoutBilling(event.target.checked);
+    const handleCheckboxChange = (event) => {
+        event.persist();
+        markAsWithoutBilling(event.target.checked);
+    };
 
     return (
         <Grid container spacing={2}>
