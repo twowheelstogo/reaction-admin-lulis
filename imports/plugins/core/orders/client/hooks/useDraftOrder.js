@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import productsQuery from "../graphql/queries/products";
 import catalogItemsQuery from "../graphql/queries/catalogItems";
 import cartByAccountIdQuery from "../graphql/queries/cartByAccountId";
@@ -648,6 +648,10 @@ function useDraftOrder(args = {}) {
         }
     };
 
+    const saveChangesAsPending = useCallback(async () => {
+        
+    });
+
     return {
         isLoadingProducts,
         products,
@@ -680,7 +684,8 @@ function useDraftOrder(args = {}) {
         billingDetails,
         giftDetails,
         setNote,
-        markAsWithoutBilling: setWithoutBilling
+        markAsWithoutBilling: setWithoutBilling,
+        saveChangesAsPending
     }
 }
 

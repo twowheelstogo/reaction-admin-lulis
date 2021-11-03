@@ -16,6 +16,10 @@ const GridButtons = styled.div`
     justify-content: flex-end;
     gap: 10px;
     padding: 5px;
+    @media only screen and (max-width: 600px) {
+        flex-direction: column;
+        justify-content: flex-start;
+    }
 `;
 
 /**
@@ -127,17 +131,22 @@ function NewOrder() {
             >
                 <GridButtons>
                     <Button
-                        color="primary"
+                        color="error"
                         variant="outlined"
-                        disabled
-                    >{"Cancelar"}</Button>
+                        // disabled
+                    >{"Eliminar Orden"}</Button>
                     <Button
                         color="primary"
+                        variant="outlined"
+                        // disabled
+                    >{"Guardar Cambios"}</Button>
+                    <Button
+                        color="secondary"
                         variant="contained"
                         isWaiting={placingOrder}
                         disabled={skipDraftOrderPlacing}
                         onClick={handlePlaceOrder}
-                    >{"Agregar Orden"}</Button>
+                    >{"Crear Pedido / Cobrar pago"}</Button>
                 </GridButtons>
             </Grid>
             <Grid item xs={12} md={8}>
