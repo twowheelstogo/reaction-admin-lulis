@@ -59,7 +59,9 @@ function NewOrder() {
         handleUpdateCartItemQuantity,
         handleRemoveCartItems,
         setNote,
-        markAsWithoutBilling
+        note,
+        markAsWithoutBilling,
+        saveChangesAsPending
     } = useDraftOrder();
     const {
         accounts,
@@ -98,6 +100,7 @@ function NewOrder() {
         handleChangeGiftDetails,
         giftDetails,
         setNote,
+        note,
         markAsWithoutBilling
     };
 
@@ -138,6 +141,7 @@ function NewOrder() {
                     <Button
                         color="primary"
                         variant="outlined"
+                        onClick={saveChangesAsPending}
                         // disabled
                     >{"Guardar Cambios"}</Button>
                     <Button

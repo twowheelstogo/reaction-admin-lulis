@@ -35,7 +35,7 @@ registerOperatorRoute({
  */
 registerOperatorRoute({
   MainComponent: NewOrder,
-  path: "/orders/draft_orders/new/:draftOrderId"
+  path: "/draft_orders/new/:draftOrderId"
 })
 
 /*

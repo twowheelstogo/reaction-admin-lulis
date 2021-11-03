@@ -181,7 +181,7 @@ function OrdersTable() {
 
     if (!error) {
       const { placeDraftOrder: { draftOrder } } = data;
-      history.push(`/${shopId}/orders/draft_orders/new/${draftOrder._id}`);
+      history.push(`/${shopId}/draft_orders/new/${draftOrder._id}`);
     }
     if (error) enqueueSnackbar(error.message, { variant: "error" });
   }

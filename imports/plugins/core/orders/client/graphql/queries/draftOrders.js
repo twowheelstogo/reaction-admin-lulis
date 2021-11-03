@@ -9,6 +9,10 @@ query draftOrdersQuery($shopIds: [ID], $filters: OrderFilterInput, $first: Conne
       cartId
       cartToken
       createdAt
+      orderId
+      order{
+        referenceId
+      }
       account{
         name
         firstName

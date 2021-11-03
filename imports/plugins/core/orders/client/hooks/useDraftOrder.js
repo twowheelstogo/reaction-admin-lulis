@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import productsQuery from "../graphql/queries/products";
 import catalogItemsQuery from "../graphql/queries/catalogItems";
 import cartByAccountIdQuery from "../graphql/queries/cartByAccountId";
 import anonymousCartByCartIdQuery from "../graphql/queries/anonymousCartByCartId";
@@ -15,11 +14,12 @@ import {
     setFulfillmentOptionCartMutation,
     updateFulfillmentOptionsForGroup as updateFulfillmentOptionsForGroupMutation,
     updateFulfillmentTypeForGroup as updateFulfillmentTypeForGroupMutation,
-    addDraftOrderCartItemsMutation,
+    addDraftOrderCartItemsMutation
 } from "../graphql/mutations/cart";
 import {
     createDraftOrderCartMutation,
-    addDraftOrderAccountMutation
+    addDraftOrderAccountMutation,
+    updateDraftOrderMutation
 } from "../graphql/mutations/draftOrder";
 import {
     placeOrderMutation
@@ -107,6 +107,21 @@ function useDraftOrder(args = {}) {
 
         return null;
     }, [accountData]);
+
+    useEffect(() => {
+
+        if (draftOrder) {
+            if (draftOrder.notes) {
+                setNote(draftOrder.notes[0].content)
+            }
+            if (draftOrder.billing) {
+                setBillingDetails(draftOrder.billing);
+            }
+            if (draftOrder.giftNote) {
+                setGiftDetails(draftOrder.giftNote);
+            }
+        }
+    }, [draftOrder])
 
     const shouldSkipAccountCartByAccountIdQuery = Boolean(!selectedAccount || anonymousCartToken || anonymousCartId || isLoadingDraftOrder || !shopId);
     const shouldSkipAnonymousCartByCartIdQuery = Boolean(selectedAccount || isLoadingDraftOrder || !anonymousCartId || !anonymousCartToken);
@@ -560,6 +575,14 @@ function useDraftOrder(args = {}) {
         }
     });
 
+    const date = new Date();
+
+    const buildNote = [{
+        content: (withoutBilling && note && note.concat(" - ", "NO ENVIAR FACTURA")) || withoutBilling && "NO ENVIAR FACTURA" || note,
+        createdAt: date,
+        updatedAt: date
+    }];
+
     const buildOrder = async () => {
         const { checkout } = cart;
         if (!selectedAccount) throw new Error("Debes seleccionar un cliente");
@@ -587,13 +610,6 @@ function useDraftOrder(args = {}) {
                 type: group.type
             };
         });
-        const date = new Date();
-
-        const buildNote = [{
-            content: (withoutBilling && note && note.concat(" - ", "NO ENVIAR FACTURA")) || withoutBilling && "NO ENVIAR FACTURA" || note,
-            createdAt: date,
-            updatedAt: date
-        }];
 
         console.log(buildNote);
 
@@ -648,8 +664,30 @@ function useDraftOrder(args = {}) {
         }
     };
 
+    const [updateDraftOrder] = useMutation(updateDraftOrderMutation);
+
     const saveChangesAsPending = useCallback(async () => {
-        
+
+        try {
+            const input = {
+                billing: billingDetails,
+                giftNote: giftDetails,
+                shopId,
+                draftOrderId,
+                notes: buildNote[0].content && buildNote
+            };
+
+            await updateDraftOrder({
+                variables: {
+                    input
+                }
+            });
+            history.push(`/${shopId}/draft_orders`);
+            enqueueSnackbar("Borrador guardado!", { variant: "success" });
+        } catch (error) {
+            console.error(error.message.replace("GraphQL error: ", ""));
+            enqueueSnackbar(error.message.replace("GraphQL error: ", ""), { variant: "error" });
+        }
     });
 
     return {
@@ -685,7 +723,8 @@ function useDraftOrder(args = {}) {
         giftDetails,
         setNote,
         markAsWithoutBilling: setWithoutBilling,
-        saveChangesAsPending
+        saveChangesAsPending,
+        note
     }
 }
 

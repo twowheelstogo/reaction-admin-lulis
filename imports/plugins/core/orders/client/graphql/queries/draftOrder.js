@@ -41,6 +41,23 @@ export default gql`
         }
       }
     }
+    notes
+      giftNote{
+        sender
+        receiver
+        message
+      }
+      billing{
+        customerName
+        nit
+        country
+        city
+        address
+        depto
+        name
+        isCf
+        partnerId
+      }
   }
 }
 `;

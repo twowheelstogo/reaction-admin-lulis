@@ -184,7 +184,7 @@ function ShippingMethod(props) {
                             <RadioItem
                                 key={`${fulfillment.fulfillmentMethod._id}`}
                                 value={JSON.stringify(fulfillment)}
-                                selected={fulfillment.fulfillmentMethod._id == selectedFulfillmentOption.fulfillmentMethod._id}
+                                selected={fulfillment.fulfillmentMethod._id == selectedFulfillmentOption?.fulfillmentMethod._id}
                                 handleChange={() => handleSelectFulfillmentOption(fulfillment.fulfillmentMethod._id)}
                                 title={fulfillment.fulfillmentMethod.displayName}
                                 subtitle={fulfillment.price.displayAmount}

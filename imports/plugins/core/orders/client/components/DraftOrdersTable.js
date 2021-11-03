@@ -181,14 +181,19 @@ function DraftOrdersTable() {
 
     if (!error) {
       const { placeDraftOrder: { draftOrder } } = data;
-      history.push(`/${shopId}/orders/draft_orders/new/${draftOrder._id}`);
+      history.push(`/${shopId}/draft_orders/new/${draftOrder._id}`);
     }
     if (error) enqueueSnackbar(error.message, { variant: "error" });
   }
 
   // Row click callback
   const onRowClick = useCallback(async ({ row }) => {
-    history.push(`/${shopId}/orders/${row.original.referenceId}`);
+    console.log(row);
+    if(row.original.orderId) {
+      history.push(`/${shopId}/orders/${row.original.order.referenceId}`);
+    } else {
+      history.push(`/${shopId}/draft_orders/new/${row.original._id}`);
+    }
   }, [history, shopId]);
 
   const labels = useMemo(() => ({
