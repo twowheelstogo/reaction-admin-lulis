@@ -19,7 +19,8 @@ import {
 import {
     createDraftOrderCartMutation,
     addDraftOrderAccountMutation,
-    updateDraftOrderMutation
+    updateDraftOrderMutation,
+    deleteDraftOrderMutation
 } from "../graphql/mutations/draftOrder";
 import {
     placeOrderMutation
@@ -690,6 +691,26 @@ function useDraftOrder(args = {}) {
         }
     });
 
+    const [deleteDraftOrder] = useMutation(deleteDraftOrderMutation);
+
+    const handleDeleteOrder = useCallback(async () => {
+        console.log(draftOrder, draftOrderId);
+        try {
+            await deleteDraftOrder({
+                variables: {
+                    input: {
+                        draftOrderId
+                    }
+                }
+            });
+            history.push(`/${shopId}/draft_orders`);
+            enqueueSnackbar("Orden eliminada!", { variant: "success" });
+        } catch (error) {
+            console.error(error.message.replace("GraphQL error: ", ""));
+            enqueueSnackbar(error.message.replace("GraphQL error: ", ""), { variant: "error" });
+        }
+    });
+
     return {
         isLoadingProducts,
         products,
@@ -724,7 +745,8 @@ function useDraftOrder(args = {}) {
         setNote,
         markAsWithoutBilling: setWithoutBilling,
         saveChangesAsPending,
-        note
+        note,
+        handleDeleteOrder
     }
 }
 

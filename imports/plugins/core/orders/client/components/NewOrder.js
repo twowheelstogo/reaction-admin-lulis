@@ -9,6 +9,10 @@ import useDraftOrder from "../hooks/useDraftOrder";
 import useAccounts from "../hooks/useAccounts";
 import { Button } from "@reactioncommerce/catalyst";
 import styled from "styled-components";
+import PrimaryAppBar from "/imports/client/ui/components/PrimaryAppBar/PrimaryAppBar";
+import { makeStyles } from "@material-ui/core";
+import { useHistory } from "react-router-dom";
+import ArrowLeft from "mdi-material-ui/ArrowLeft";
 
 const GridButtons = styled.div`
     display: flex;
@@ -21,6 +25,16 @@ const GridButtons = styled.div`
         justify-content: flex-start;
     }
 `;
+
+const useStyles = makeStyles({
+    goBackTitleLink: {
+      display: "flex",
+      alignItems: "center"
+    },
+    title: {
+      marginLeft: 10
+    }
+  });
 
 /**
  * @name NewOrder
@@ -61,7 +75,8 @@ function NewOrder() {
         setNote,
         note,
         markAsWithoutBilling,
-        saveChangesAsPending
+        saveChangesAsPending,
+        handleDeleteOrder
     } = useDraftOrder();
     const {
         accounts,
@@ -69,6 +84,9 @@ function NewOrder() {
         accountsQuery,
         setAccountsQuery
     } = useAccounts();
+    
+    const classes = useStyles();
+    const history = useHistory();
 
     const accountProps = {
         accounts,
@@ -127,8 +145,31 @@ function NewOrder() {
 
     const skipDraftOrderPlacing = Boolean(placingOrder || Object.keys(cart || {}).length == 0);
 
+    const backIconTitle = (
+        // eslint-disable-next-line jsx-a11y/anchor-is-valid
+        <a href="#" className={classes.goBackTitleLink} onClick={(event) => {
+          event.preventDefault();
+          history.goBack();
+        }}
+        >
+          <ArrowLeft />
+          <span className={classes.title}>
+            {'Nueva Orden'}
+          </span>
+        </a>
+      );
+
     return (
         <Grid container spacing={2}>
+            <PrimaryAppBar title={backIconTitle}>
+                    <Button
+                        color="secondary"
+                        variant="contained"
+                        isWaiting={placingOrder}
+                        disabled={skipDraftOrderPlacing}
+                        onClick={handlePlaceOrder}
+                    >{"Crear / Cobrar Pedido"}</Button>
+            </PrimaryAppBar>
             <Grid
                 xs={12}
             >
@@ -137,6 +178,7 @@ function NewOrder() {
                         color="error"
                         variant="outlined"
                         // disabled
+                        onClick={handleDeleteOrder}
                     >{"Eliminar Orden"}</Button>
                     <Button
                         color="primary"
@@ -144,13 +186,6 @@ function NewOrder() {
                         onClick={saveChangesAsPending}
                         // disabled
                     >{"Guardar Cambios"}</Button>
-                    <Button
-                        color="secondary"
-                        variant="contained"
-                        isWaiting={placingOrder}
-                        disabled={skipDraftOrderPlacing}
-                        onClick={handlePlaceOrder}
-                    >{"Crear Pedido / Cobrar pago"}</Button>
                 </GridButtons>
             </Grid>
             <Grid item xs={12} md={8}>
