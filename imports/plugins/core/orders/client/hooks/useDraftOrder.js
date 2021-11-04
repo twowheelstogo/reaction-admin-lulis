@@ -68,6 +68,8 @@ function useDraftOrder(args = {}) {
     const [giftDetails, setGiftDetails] = useState({});
     const [note, setNote] = useState(null);
     const [withoutBilling, setWithoutBilling] = useState(false);
+    const [deliveryDate, setDeliveryDate] = useState(null);
+    const [instantDelivery, setInstantDelivery] = useState(true);
 
     const [addDraftOrderAccount] = useMutation(addDraftOrderAccountMutation);
     const [updateFulfillmentOptionsForGroup] = useMutation(updateFulfillmentOptionsForGroupMutation);
@@ -120,6 +122,11 @@ function useDraftOrder(args = {}) {
             }
             if (draftOrder.giftNote) {
                 setGiftDetails(draftOrder.giftNote);
+            }
+            if (draftOrder.deliveryDate) {
+                const date = new Date(draftOrder.deliveryDate);
+                setDeliveryDate(date);
+                setInstantDelivery(false);
             }
         }
     }, [draftOrder])
@@ -620,6 +627,7 @@ function useDraftOrder(args = {}) {
             email: selectedAccount.primaryEmailAddress,
             fulfillmentGroups,
             shopId,
+            deliveryDate: (!instantDelivery && deliveryDate) || null,
             notes: buildNote[0].content && buildNote
         };
     };
@@ -678,6 +686,10 @@ function useDraftOrder(args = {}) {
                 notes: buildNote[0].content && buildNote
             };
 
+            if (!instantDelivery) Object.assign(input, { deliveryDate });
+
+            console.log(input);
+
             await updateDraftOrder({
                 variables: {
                     input
@@ -710,6 +722,16 @@ function useDraftOrder(args = {}) {
             enqueueSnackbar(error.message.replace("GraphQL error: ", ""), { variant: "error" });
         }
     });
+
+    const handleSelectDeliveryDate = (event) => {
+        event.persist();
+        setInstantDelivery(false);
+
+        if (event.target.value.length == 0) return setInstantDelivery(true);
+        const date = new Date(event.target.value);
+
+        setDeliveryDate(date);
+    };
 
     return {
         isLoadingProducts,
@@ -746,7 +768,11 @@ function useDraftOrder(args = {}) {
         markAsWithoutBilling: setWithoutBilling,
         saveChangesAsPending,
         note,
-        handleDeleteOrder
+        handleDeleteOrder,
+        handleSelectDeliveryDate,
+        handleSelectInstantDelivery: setInstantDelivery,
+        deliveryDate,
+        instantDelivery
     }
 }
 

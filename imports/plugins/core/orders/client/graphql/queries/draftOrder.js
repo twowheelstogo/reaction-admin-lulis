@@ -41,6 +41,7 @@ export default gql`
         }
       }
     }
+    deliveryDate
     notes
       giftNote{
         sender

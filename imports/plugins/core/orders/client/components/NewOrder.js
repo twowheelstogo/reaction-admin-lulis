@@ -76,7 +76,11 @@ function NewOrder() {
         note,
         markAsWithoutBilling,
         saveChangesAsPending,
-        handleDeleteOrder
+        handleDeleteOrder,
+        handleSelectDeliveryDate,
+        handleSelectInstantDelivery,
+        deliveryDate,
+        instantDelivery
     } = useDraftOrder();
     const {
         accounts,
@@ -140,7 +144,11 @@ function NewOrder() {
         selectFulfillmentType: setSelectedFulfillmentType,
         fulfillmentGroup: fulfillmentGroup || null,
         addAccountAddressBookEntry,
-        addingAddressbook
+        addingAddressbook,
+        handleSelectDeliveryDate,
+        handleSelectInstantDelivery,
+        deliveryDate,
+        instantDelivery
     }
 
     const skipDraftOrderPlacing = Boolean(placingOrder || Object.keys(cart || {}).length == 0);
