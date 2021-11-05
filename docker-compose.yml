@@ -15,7 +15,7 @@ services:
   reaction-admin:
     # image: reactioncommerce/admin:3.0.0-beta.11
     # image: reactioncommerce/admin:3.0.0-beta.13
-    image: luiscelano/reaction-admin-lulis:pre-launch
+    image: luiscelano/reaction-admin-lulis:3.0.1
     build:
       context: .
     env_file:
