@@ -9,6 +9,10 @@ import useDraftOrder from "../hooks/useDraftOrder";
 import useAccounts from "../hooks/useAccounts";
 import { Button } from "@reactioncommerce/catalyst";
 import styled from "styled-components";
+import PrimaryAppBar from "/imports/client/ui/components/PrimaryAppBar/PrimaryAppBar";
+import { makeStyles } from "@material-ui/core";
+import { useHistory } from "react-router-dom";
+import ArrowLeft from "mdi-material-ui/ArrowLeft";
 
 const GridButtons = styled.div`
     display: flex;
@@ -16,7 +20,21 @@ const GridButtons = styled.div`
     justify-content: flex-end;
     gap: 10px;
     padding: 5px;
+    @media only screen and (max-width: 600px) {
+        flex-direction: column;
+        justify-content: flex-start;
+    }
 `;
+
+const useStyles = makeStyles({
+    goBackTitleLink: {
+      display: "flex",
+      alignItems: "center"
+    },
+    title: {
+      marginLeft: 10
+    }
+  });
 
 /**
  * @name NewOrder
@@ -55,7 +73,14 @@ function NewOrder() {
         handleUpdateCartItemQuantity,
         handleRemoveCartItems,
         setNote,
-        markAsWithoutBilling
+        note,
+        markAsWithoutBilling,
+        saveChangesAsPending,
+        handleDeleteOrder,
+        handleSelectDeliveryDate,
+        handleSelectInstantDelivery,
+        deliveryDate,
+        instantDelivery
     } = useDraftOrder();
     const {
         accounts,
@@ -63,6 +88,9 @@ function NewOrder() {
         accountsQuery,
         setAccountsQuery
     } = useAccounts();
+    
+    const classes = useStyles();
+    const history = useHistory();
 
     const accountProps = {
         accounts,
@@ -94,6 +122,7 @@ function NewOrder() {
         handleChangeGiftDetails,
         giftDetails,
         setNote,
+        note,
         markAsWithoutBilling
     };
 
@@ -115,29 +144,56 @@ function NewOrder() {
         selectFulfillmentType: setSelectedFulfillmentType,
         fulfillmentGroup: fulfillmentGroup || null,
         addAccountAddressBookEntry,
-        addingAddressbook
+        addingAddressbook,
+        handleSelectDeliveryDate,
+        handleSelectInstantDelivery,
+        deliveryDate,
+        instantDelivery
     }
 
     const skipDraftOrderPlacing = Boolean(placingOrder || Object.keys(cart || {}).length == 0);
 
+    const backIconTitle = (
+        // eslint-disable-next-line jsx-a11y/anchor-is-valid
+        <a href="#" className={classes.goBackTitleLink} onClick={(event) => {
+          event.preventDefault();
+          history.goBack();
+        }}
+        >
+          <ArrowLeft />
+          <span className={classes.title}>
+            {'Nueva Orden'}
+          </span>
+        </a>
+      );
+
     return (
         <Grid container spacing={2}>
+            <PrimaryAppBar title={backIconTitle}>
+                    <Button
+                        color="secondary"
+                        variant="contained"
+                        isWaiting={placingOrder}
+                        disabled={skipDraftOrderPlacing}
+                        onClick={handlePlaceOrder}
+                    >{"Crear / Cobrar Pedido"}</Button>
+            </PrimaryAppBar>
             <Grid
                 xs={12}
             >
                 <GridButtons>
                     <Button
-                        color="primary"
+                        color="error"
                         variant="outlined"
-                        disabled
-                    >{"Cancelar"}</Button>
+                        // disabled
+                        onClick={handleDeleteOrder}
+                    >{"Eliminar Orden"}</Button>
                     <Button
                         color="primary"
-                        variant="contained"
-                        isWaiting={placingOrder}
-                        disabled={skipDraftOrderPlacing}
-                        onClick={handlePlaceOrder}
-                    >{"Agregar Orden"}</Button>
+                        variant="outlined"
+                        onClick={saveChangesAsPending}
+                        // disabled
+                    >{"Guardar Cambios"}</Button>
                 </GridButtons>
             </Grid>
             <Grid item xs={12} md={8}>

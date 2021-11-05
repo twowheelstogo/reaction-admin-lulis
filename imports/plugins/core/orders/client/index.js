@@ -1,11 +1,13 @@
 import React from "react";
 import InboxIcon from "mdi-material-ui/Inbox";
+import ReceiptIcon from "mdi-material-ui/Receipt";
 import { registerBlock } from "@reactioncommerce/reaction-components";
 import { registerOperatorRoute } from "/imports/client/ui";
 import ContentViewExtraWideLayout from "/imports/client/ui/layouts/ContentViewExtraWideLayout";
 import { Shop } from "/imports/collections/schemas";
 import OrderCardSummary from "./components/OrderCardSummary";
 import Orders from "./components/OrdersTable";
+import DraftOrders from "./components/DraftOrdersTable";
 import Order from "./containers/OrderContainer";
 import OrderPrint from "./containers/OrderPrintContainer";
 import NewOrder from "./components/NewOrder";
@@ -33,7 +35,7 @@ registerOperatorRoute({
  */
 registerOperatorRoute({
   MainComponent: NewOrder,
-  path: "/orders/draft_orders/new/:draftOrderId"
+  path: "/draft_orders/new/:draftOrderId"
 })
 
 /*
@@ -58,6 +60,19 @@ registerOperatorRoute({
   sidebarI18nLabel: "admin.dashboard.ordersLabel"
 });
 
+/**
+ * Draft orders table route
+ */
+ registerOperatorRoute({
+  group: "navigation",
+  priority: 10,
+  LayoutComponent: ContentViewExtraWideLayout,
+  MainComponent: DraftOrders,
+  path: "/draft_orders",
+  // eslint-disable-next-line react/display-name
+  SidebarIconComponent: (props) => <ReceiptIcon {...props} />,
+  sidebarI18nLabel: "admin.dashboard.draftordersLabel"
+});
 
 // Register order related blocks
 /*

@@ -49,18 +49,25 @@ flex: 0 1 calc(50% - 5px);
  * @returns {React.Component} returns a React component
  */
 function MoreDetailsOrder(props) {
-    const { handleChangeBillingDetails, value, handleChangeGiftDetails, giftDetails, setNote, markAsWithoutBilling } = props;
+    const { handleChangeBillingDetails, value, handleChangeGiftDetails, giftDetails, setNote, markAsWithoutBilling, note } = props;
     const {
         nit,
         address,
         name
     } = value;
+
+    const {
+        sender,
+        receiver,
+        message
+    } = giftDetails || {};
+
     const { oidcUser } = useReactOidc();
     const { access_token: accessToken } = oidcUser || {};
 
     const handleSearchCustomer = async () => {
         const service = await BillingServices.getNit(nit, accessToken);
-        console.log(service);
+
         if (service.hasData) {
             handleChangeBillingDetails({
                 ...value,
@@ -117,6 +124,7 @@ function MoreDetailsOrder(props) {
                                         name="nit"
                                         id="nit"
                                         placeholder="Nit"
+                                        value={nit}
                                         onKeyDown={handleKeyDown}
                                         onChange={handleChange}
                                     />
@@ -163,6 +171,7 @@ function MoreDetailsOrder(props) {
                                     id="sender"
                                     name="sender"
                                     placeholder="De"
+                                    value={sender}
                                     onChange={handleChangeGift}
                                 />
                             </ColHalf>
@@ -171,6 +180,7 @@ function MoreDetailsOrder(props) {
                                     id="receiver"
                                     name="receiver"
                                     placeholder="Para"
+                                    value={receiver}
                                     onChange={handleChangeGift}
                                 />
                             </ColHalf>
@@ -178,6 +188,7 @@ function MoreDetailsOrder(props) {
                                 <TextField
                                     id="message"
                                     name="message"
+                                    value={message}
                                     placeholder="Escribe algo..."
                                     multiline
                                     onChange={handleChangeGift}
@@ -191,6 +202,7 @@ function MoreDetailsOrder(props) {
                             <TextField
                                 id="note"
                                 name="note"
+                                value={note}
                                 placeholder="Escribe algo..."
                                 multiline
                                 onChange={handleChangeNote}

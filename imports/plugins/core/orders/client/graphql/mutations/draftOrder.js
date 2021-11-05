@@ -41,3 +41,84 @@ export const placeDraftOrderMutation = gql`
   }
 }
 `;
+
+export const updateDraftOrderMutation = gql`
+  mutation updateDraftOrderMutation($input: UpdateDraftOrderInput!){
+  	updateDraftOrder(input: $input) {
+    draftOrder{
+      _id
+      referenceId
+      cartId
+      createdAt
+      orderId
+      order{
+        status
+        referenceId
+      }
+      updatedAt
+      cartToken
+      account{
+        name
+        primaryEmailAddress
+      }
+      notes
+      giftNote{
+        sender
+        receiver
+        message
+      }
+      billing{
+        customerName
+        nit
+        country
+        city
+        address
+        depto
+        name
+        isCf
+        partnerId
+      }
+    }
+  }
+}
+`;
+
+export const deleteDraftOrderMutation = gql`
+  mutation deleteDraftOrderMutation($input: DeleteDraftOrderInput!){
+    deleteDraftOrder(input: $input){
+      draftOrder{
+      _id
+      referenceId
+      cartId
+      createdAt
+      orderId
+      order{
+        status
+        referenceId
+      }
+      cartToken
+      account{
+        name
+        primaryEmailAddress
+      }
+      notes
+      giftNote{
+        sender
+        receiver
+        message
+      }
+      billing{
+        customerName
+        nit
+        country
+        city
+        address
+        depto
+        name
+        isCf
+        partnerId
+      }
+    }
+  }
+  }
+`;

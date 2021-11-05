@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Card, CardContent, FormControl, Radio, RadioGroup, FormControlLabel, Button } from "@material-ui/core";
+import { Card, CardContent, Radio, Checkbox, FormControlLabel, Button } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import CreateAddressModal from "./CreateAddress";
+import { TextField } from "@reactioncommerce/catalyst";
+import { applyTheme } from "@reactioncommerce/components/utils";
 
 const styles = (theme) => ({
     radioLabel: {
@@ -29,6 +31,19 @@ const StyledRadio = withStyles({
         zIndex: 0
     }
 })((props) => <Radio color="default" {...props} />);
+
+const buildDate = (value) => {
+    const date = new Date;
+
+    return `${date.getFullYear()}-${`${date.getMonth() +
+        1}`.padStart(2, 0)}-${`${date.getDate() + 1}`.padStart(
+            2,
+            0
+        )}T${`${date.getHours()}`.padStart(
+            2,
+            0
+        )}:${`${date.getMinutes()}`.padStart(2, 0)}`;
+}
 
 const Item = styled.div`
     display: flex;
@@ -77,6 +92,27 @@ const TitleLayout = styled.div`
     align-items: center;
 `;
 
+const FormGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+`;
+
+const ColFull = styled.div`
+    flex: 1 1 100%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+`;
+
+const ColHalf = styled.div`
+flex: 0 1 calc(50% - 5px);
+  padding-top: 5px;
+  padding-bottom: 5px;
+  @media (min-width: ${applyTheme("sm", "breakpoints")}px) {
+    flex: 0 1 calc(50% - 5px);
+  }
+`;
+
 /**
  * @name ShippingMethod
  * @param {Object} props Component props
@@ -110,8 +146,13 @@ function ShippingMethod(props) {
         classes,
         fulfillmentGroup,
         addAccountAddressBookEntry,
-        addingAddressBook
+        addingAddressBook,
+        handleSelectDeliveryDate,
+        handleSelectInstantDelivery,
+        instantDelivery,
+        deliveryDate
     } = props;
+
     const [open, setOpen] = useState(false);
 
     const handleClose = () => setOpen(false);
@@ -184,7 +225,7 @@ function ShippingMethod(props) {
                             <RadioItem
                                 key={`${fulfillment.fulfillmentMethod._id}`}
                                 value={JSON.stringify(fulfillment)}
-                                selected={fulfillment.fulfillmentMethod._id == selectedFulfillmentOption.fulfillmentMethod._id}
+                                selected={fulfillment.fulfillmentMethod._id == selectedFulfillmentOption?.fulfillmentMethod._id}
                                 handleChange={() => handleSelectFulfillmentOption(fulfillment.fulfillmentMethod._id)}
                                 title={fulfillment.fulfillmentMethod.displayName}
                                 subtitle={fulfillment.price.displayAmount}
@@ -192,6 +233,41 @@ function ShippingMethod(props) {
                         ))}
                     </List>
                 </CardContainer>
+            </div>
+        );
+    }
+
+    function renderDeliveryDate() {
+
+        const handleCheckboxChange = (event) => {
+            event.persist();
+            handleSelectInstantDelivery(event.target.checked);
+        }
+
+        const parsedDate = deliveryDate && buildDate(deliveryDate);
+
+        console.log(deliveryDate, parsedDate)
+
+        return (
+            <div>
+                <CustomTitle>Fecha y hora de Entrega</CustomTitle>
+                <FormGrid>
+                    <ColFull>
+                        <TextField
+                            name="date"
+                            id="date"
+                            placeholder="Fecha"
+                            type="datetime-local"
+                            defaultValue={parsedDate}
+                            onChange={handleSelectDeliveryDate}
+                        />
+                    </ColFull>
+                    <FormControlLabel control={
+                        <Checkbox
+                            checked={instantDelivery}
+                            onChange={handleCheckboxChange}
+                        />} label="Entrega inmediata" />
+                </FormGrid>
             </div>
         );
     }
@@ -226,6 +302,7 @@ function ShippingMethod(props) {
                     <div>
                         {renderShippingMethod()}
                         {renderFulfillmentMethods()}
+                        {renderDeliveryDate()}
                     </div>
                 )}
                 {fulfillmentGroup?.type == "pickup" && renderPickupMethod()}
@@ -245,7 +322,11 @@ ShippingMethod.propTypes = {
     classes: PropTypes.any,
     fulfillmentGroup: PropTypes.object,
     addAccountAddressBookEntry: PropTypes.func,
-    addingAddressBook: PropTypes.bool
+    addingAddressBook: PropTypes.bool,
+    deliveryDate: PropTypes.any,
+    handleSelectDeliveryDate: PropTypes.func,
+    handleSelectInstantDelivery: PropTypes.func,
+    instantDelivery: PropTypes.bool
 };
 
 ShippingMethod.defaultProps = {
@@ -257,7 +338,9 @@ ShippingMethod.defaultProps = {
     selectedFulfillmentMethod: null,
     selectedFulfillmentType: null,
     addingAddressBook: false,
-    addAccountAddressBookEntry() { }
+    addAccountAddressBookEntry() { },
+    handleSelectDeliveryDate() { },
+    handleSelectInstantDelivery() { }
 };
 
 export default withStyles(styles)(ShippingMethod);

@@ -7,7 +7,7 @@ import { makeDataTableColumnFilter } from "@reactioncommerce/catalyst/DataTableF
 import { useApolloClient } from "@apollo/react-hooks";
 import useCurrentShopId from "/imports/client/ui/hooks/useCurrentShopId";
 import { Box, Card, CardHeader, CardContent, makeStyles } from "@material-ui/core";
-import ordersQuery from "../graphql/queries/orders";
+import ordersQuery from "../graphql/queries/draftOrders";
 import { formatDateRangeFilter } from "../../client/helpers";
 import OrderDateCell from "./DataTable/OrderDateCell";
 import OrderIdCell from "./DataTable/OrderIdCell";
@@ -22,10 +22,10 @@ const useStyles = makeStyles({
 });
 
 /**
- * @name OrdersTable
+ * @name DraftOrdersTable
  * @returns {React.Component} A React component
  */
-function OrdersTable() {
+function DraftOrdersTable() {
   const apolloClient = useApolloClient();
   const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
@@ -37,7 +37,7 @@ function OrdersTable() {
   const columns = useMemo(() => [
     {
       Header: i18next.t("admin.table.headers.id"),
-      accessor: "orderId",
+      accessor: "referenceId",
       // eslint-disable-next-line react/no-multi-comp,react/display-name,react/prop-types
       Cell: ({ row, cell }) => <OrderIdCell row={row} cell={cell} />
     },
@@ -77,38 +77,38 @@ function OrdersTable() {
       }),
       show: false
     },
-    {
-      Header: i18next.t("admin.table.headers.payment"),
-      accessor: (row) => row.payments[0].status,
-      id: "paymentStatus",
-      // eslint-disable-next-line react/no-multi-comp,react/display-name,react/prop-types
-      Cell: ({ row }) => <Fragment>{i18next.t(`admin.table.paymentStatus.${row.values.paymentStatus}`)}</Fragment>,
-      Filter: makeDataTableColumnFilter({
-        isMulti: true,
-        options: [
-          { label: i18next.t("admin.table.paymentStatus.completed"), value: "completed" },
-          { label: i18next.t("admin.table.paymentStatus.created"), value: "created" }
-        ]
-      })
-    },
-    {
-      Header: i18next.t("admin.table.headers.fulfillment"),
-      accessor: (row) => row.fulfillmentGroups[0].status,
-      id: "fulfillmentStatus",
-      // eslint-disable-next-line react/no-multi-comp,react/display-name,react/prop-types
-      Cell: ({ row }) => <Fragment>{i18next.t(`admin.table.fulfillmentStatus.${row.values.fulfillmentStatus}`)}</Fragment>,
-      Filter: makeDataTableColumnFilter({
-        isMulti: true,
-        options: [
-          { label: i18next.t("admin.table.fulfillmentStatus.coreOrderWorkflow/completed"), value: "completed" },
-          { label: i18next.t("admin.table.fulfillmentStatus.new"), value: "new" },
-          { label: i18next.t("admin.table.fulfillmentStatus.coreOrderWorkflow/processing"), value: "processing" }
-        ]
-      })
-    },
+    // {
+    //   Header: i18next.t("admin.table.headers.payment"),
+    //   accessor: (row) => row.payments[0].status,
+    //   id: "paymentStatus",
+    //   // eslint-disable-next-line react/no-multi-comp,react/display-name,react/prop-types
+    //   Cell: ({ row }) => <Fragment>{i18next.t(`admin.table.paymentStatus.${row.values.paymentStatus}`)}</Fragment>,
+    //   Filter: makeDataTableColumnFilter({
+    //     isMulti: true,
+    //     options: [
+    //       { label: i18next.t("admin.table.paymentStatus.completed"), value: "completed" },
+    //       { label: i18next.t("admin.table.paymentStatus.created"), value: "created" }
+    //     ]
+    //   })
+    // },
+    // {
+    //   Header: i18next.t("admin.table.headers.fulfillment"),
+    //   accessor: (row) => row.fulfillmentGroups[0].status,
+    //   id: "fulfillmentStatus",
+    //   // eslint-disable-next-line react/no-multi-comp,react/display-name,react/prop-types
+    //   Cell: ({ row }) => <Fragment>{i18next.t(`admin.table.fulfillmentStatus.${row.values.fulfillmentStatus}`)}</Fragment>,
+    //   Filter: makeDataTableColumnFilter({
+    //     isMulti: true,
+    //     options: [
+    //       { label: i18next.t("admin.table.fulfillmentStatus.coreOrderWorkflow/completed"), value: "completed" },
+    //       { label: i18next.t("admin.table.fulfillmentStatus.new"), value: "new" },
+    //       { label: i18next.t("admin.table.fulfillmentStatus.coreOrderWorkflow/processing"), value: "processing" }
+    //     ]
+    //   })
+    // },
     {
       Header: i18next.t("admin.table.headers.customer"),
-      accessor: "email" /*"payments[0].billingAddress.description"*/
+      accessor: (row) => row.account && row.account.primaryEmailAddress /*"payments[0].billingAddress.description"*/
     },
     {
       accessor: "summary.total.displayAmount",
@@ -162,8 +162,8 @@ function OrdersTable() {
     }
 
     // Update the state with the fetched data as an array of objects and the calculated page count
-    setTableData(data.orders.nodes);
-    setPageCount(Math.ceil(data.orders.totalCount / pageSize));
+    setTableData(data.draftOrders.nodes);
+    setPageCount(Math.ceil(data.draftOrders.totalCount / pageSize));
 
     setIsLoading(false);
   }, [apolloClient, enqueueSnackbar, shopId]);
@@ -188,7 +188,12 @@ function OrdersTable() {
 
   // Row click callback
   const onRowClick = useCallback(async ({ row }) => {
-    history.push(`/${shopId}/orders/${row.original.referenceId}`);
+    console.log(row);
+    if(row.original.orderId) {
+      history.push(`/${shopId}/orders/${row.original.order.referenceId}`);
+    } else {
+      history.push(`/${shopId}/draft_orders/new/${row.original._id}`);
+    }
   }, [history, shopId]);
 
   const labels = useMemo(() => ({
@@ -234,4 +239,4 @@ function OrdersTable() {
   );
 }
 
-export default OrdersTable;
+export default DraftOrdersTable;

@@ -1,5 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
-import productsQuery from "../graphql/queries/products";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import catalogItemsQuery from "../graphql/queries/catalogItems";
 import cartByAccountIdQuery from "../graphql/queries/cartByAccountId";
 import anonymousCartByCartIdQuery from "../graphql/queries/anonymousCartByCartId";
@@ -15,11 +14,13 @@ import {
     setFulfillmentOptionCartMutation,
     updateFulfillmentOptionsForGroup as updateFulfillmentOptionsForGroupMutation,
     updateFulfillmentTypeForGroup as updateFulfillmentTypeForGroupMutation,
-    addDraftOrderCartItemsMutation,
+    addDraftOrderCartItemsMutation
 } from "../graphql/mutations/cart";
 import {
     createDraftOrderCartMutation,
-    addDraftOrderAccountMutation
+    addDraftOrderAccountMutation,
+    updateDraftOrderMutation,
+    deleteDraftOrderMutation
 } from "../graphql/mutations/draftOrder";
 import {
     placeOrderMutation
@@ -67,6 +68,8 @@ function useDraftOrder(args = {}) {
     const [giftDetails, setGiftDetails] = useState({});
     const [note, setNote] = useState(null);
     const [withoutBilling, setWithoutBilling] = useState(false);
+    const [deliveryDate, setDeliveryDate] = useState(null);
+    const [instantDelivery, setInstantDelivery] = useState(true);
 
     const [addDraftOrderAccount] = useMutation(addDraftOrderAccountMutation);
     const [updateFulfillmentOptionsForGroup] = useMutation(updateFulfillmentOptionsForGroupMutation);
@@ -107,6 +110,26 @@ function useDraftOrder(args = {}) {
 
         return null;
     }, [accountData]);
+
+    useEffect(() => {
+
+        if (draftOrder) {
+            if (draftOrder.notes) {
+                setNote(draftOrder.notes[0].content)
+            }
+            if (draftOrder.billing) {
+                setBillingDetails(draftOrder.billing);
+            }
+            if (draftOrder.giftNote) {
+                setGiftDetails(draftOrder.giftNote);
+            }
+            if (draftOrder.deliveryDate) {
+                const date = new Date(draftOrder.deliveryDate);
+                setDeliveryDate(date);
+                setInstantDelivery(false);
+            }
+        }
+    }, [draftOrder])
 
     const shouldSkipAccountCartByAccountIdQuery = Boolean(!selectedAccount || anonymousCartToken || anonymousCartId || isLoadingDraftOrder || !shopId);
     const shouldSkipAnonymousCartByCartIdQuery = Boolean(selectedAccount || isLoadingDraftOrder || !anonymousCartId || !anonymousCartToken);
@@ -560,6 +583,14 @@ function useDraftOrder(args = {}) {
         }
     });
 
+    const date = new Date();
+
+    const buildNote = [{
+        content: (withoutBilling && note && note.concat(" - ", "NO ENVIAR FACTURA")) || withoutBilling && "NO ENVIAR FACTURA" || note,
+        createdAt: date,
+        updatedAt: date
+    }];
+
     const buildOrder = async () => {
         const { checkout } = cart;
         if (!selectedAccount) throw new Error("Debes seleccionar un cliente");
@@ -587,13 +618,6 @@ function useDraftOrder(args = {}) {
                 type: group.type
             };
         });
-        const date = new Date();
-
-        const buildNote = [{
-            content: (withoutBilling && note && note.concat(" - ", "NO ENVIAR FACTURA")) || withoutBilling && "NO ENVIAR FACTURA" || note,
-            createdAt: date,
-            updatedAt: date
-        }];
 
         console.log(buildNote);
 
@@ -603,6 +627,7 @@ function useDraftOrder(args = {}) {
             email: selectedAccount.primaryEmailAddress,
             fulfillmentGroups,
             shopId,
+            deliveryDate: (!instantDelivery && deliveryDate) || null,
             notes: buildNote[0].content && buildNote
         };
     };
@@ -648,6 +673,66 @@ function useDraftOrder(args = {}) {
         }
     };
 
+    const [updateDraftOrder] = useMutation(updateDraftOrderMutation);
+
+    const saveChangesAsPending = useCallback(async () => {
+
+        try {
+            const input = {
+                billing: billingDetails,
+                giftNote: giftDetails,
+                shopId,
+                draftOrderId,
+                notes: buildNote[0].content && buildNote
+            };
+
+            if (!instantDelivery) Object.assign(input, { deliveryDate });
+
+            console.log(input);
+
+            await updateDraftOrder({
+                variables: {
+                    input
+                }
+            });
+            history.push(`/${shopId}/draft_orders`);
+            enqueueSnackbar("Borrador guardado!", { variant: "success" });
+        } catch (error) {
+            console.error(error.message.replace("GraphQL error: ", ""));
+            enqueueSnackbar(error.message.replace("GraphQL error: ", ""), { variant: "error" });
+        }
+    });
+
+    const [deleteDraftOrder] = useMutation(deleteDraftOrderMutation);
+
+    const handleDeleteOrder = useCallback(async () => {
+        console.log(draftOrder, draftOrderId);
+        try {
+            await deleteDraftOrder({
+                variables: {
+                    input: {
+                        draftOrderId
+                    }
+                }
+            });
+            history.push(`/${shopId}/draft_orders`);
+            enqueueSnackbar("Orden eliminada!", { variant: "success" });
+        } catch (error) {
+            console.error(error.message.replace("GraphQL error: ", ""));
+            enqueueSnackbar(error.message.replace("GraphQL error: ", ""), { variant: "error" });
+        }
+    });
+
+    const handleSelectDeliveryDate = (event) => {
+        event.persist();
+        setInstantDelivery(false);
+
+        if (event.target.value.length == 0) return setInstantDelivery(true);
+        const date = new Date(event.target.value);
+
+        setDeliveryDate(date);
+    };
+
     return {
         isLoadingProducts,
         products,
@@ -680,7 +765,14 @@ function useDraftOrder(args = {}) {
         billingDetails,
         giftDetails,
         setNote,
-        markAsWithoutBilling: setWithoutBilling
+        markAsWithoutBilling: setWithoutBilling,
+        saveChangesAsPending,
+        note,
+        handleDeleteOrder,
+        handleSelectDeliveryDate,
+        handleSelectInstantDelivery: setInstantDelivery,
+        deliveryDate,
+        instantDelivery
     }
 }
 
