@@ -305,12 +305,13 @@ function useDraftOrder(args = {}) {
                     input: {
                         cartId: cart._id || anonymousCartId,
                         cartItemIds: (Array.isArray(itemIds) && itemIds) || [itemIds],
-                        cartToken: anonymousCartToken || null
+                        cartToken: anonymousCartToken || null,
+                        accountId: selectedAccount._id || null
                     }
                 },
                 update: (cache, { data: mutationData }) => {
-                    if (mutationData && mutationData.removeCartItems) {
-                        const { cart: cartPayload } = mutationData.removeCartItems;
+                    if (mutationData && mutationData.removeCartItemsFromDraftOrder) {
+                        const { cart: cartPayload } = mutationData.removeCartItemsFromDraftOrder;
 
                         if (cartPayload) {
                             // Update Apollo cache

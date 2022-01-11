@@ -66,8 +66,8 @@ export const reconcileCartsMutation = gql`
 `;
 
 export const removeCartItemsMutation = gql`
-    mutation removeCartItemsMutation($input: RemoveCartItemsInput!) {
-  removeCartItems(input: $input) {
+    mutation removeCartItemsMutationFromDraftOrder($input: RemoveCartItemsFromDraftOrderInput!) {
+      removeCartItemsFromDraftOrder(input: $input) {
     cart {
       ...CartPayloadFragment
     }
