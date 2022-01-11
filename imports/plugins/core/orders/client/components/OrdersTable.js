@@ -15,6 +15,7 @@ import OrderTotalCell from "./DataTable/OrderTotalCell";
 import { Grid } from "@material-ui/core";
 import Button from "@reactioncommerce/catalyst/Button";
 import { placeDraftOrderMutation } from "../graphql/mutations/draftOrder";
+import OrderBranchCell from "./DataTable/OrderBranchCell";
 const useStyles = makeStyles({
   card: {
     overflow: "visible"
@@ -40,6 +41,12 @@ function OrdersTable() {
       accessor: "orderId",
       // eslint-disable-next-line react/no-multi-comp,react/display-name,react/prop-types
       Cell: ({ row, cell }) => <OrderIdCell row={row} cell={cell} />
+    },
+    {
+      Header:"sucursal",
+      accessor: "branchId",
+      // eslint-disable-next-line react/no-multi-comp,react/display-name,react/prop-types
+      Cell: ({ row, cell }) => <OrderBranchCell row={row} cell={cell} />
     },
     {
       Header: "Cliente",

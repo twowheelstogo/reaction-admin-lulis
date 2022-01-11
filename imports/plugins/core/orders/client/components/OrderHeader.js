@@ -12,11 +12,11 @@ import OrderStatusChip from "./OrderStatusChip";
 
 const styles = (theme) => ({
   extraEmphasisText: {
-    fontWeight: theme.typography.fontWeightSemiBold
+    fontWeight: theme.typography.fontWeightSemiBold,
   },
   openSidebarButton: {
-    marginLeft: "auto"
-  }
+    marginLeft: "auto",
+  },
 });
 
 /**
@@ -26,30 +26,51 @@ const styles = (theme) => ({
  */
 function OrderHeader(props) {
   const { classes, moment, order } = props;
-  const { createdAt, displayStatus, referenceId, status } = order;
+  const { createdAt, displayStatus, referenceId, status, orderId } = order;
+  console.log("order", order);
   const orderDate = (moment && moment(createdAt).format("DD/MM/YYYY h:mm A")) || createdAt.toLocaleString();
   const { payments } = order;
   const paymentStatuses = payments.map((payment) => payment.status);
   const uniqueStatuses = [...new Set(paymentStatuses)];
   const [currentShopId] = useCurrentShopId();
-
+  const getBranchName = () => {
+    try {
+      const { fulfillmentGroups } = order;
+      const [fulfillmentGroup] = fulfillmentGroups;
+      const { type: shippingType } = fulfillmentGroup;
+      const { data: dataOrder } = fulfillmentGroup;
+      if (shippingType === "pickup") {
+        const { pickupDetails } = dataOrder;
+        return pickupDetails.branch;
+      } else {
+        const { shippingAddress } = dataOrder;
+        return shippingAddress.metaddress.distance.branch;
+      }
+    } catch (err) {
+      return "sin sucursal";
+    }
+  };
   let paymentStatusChip;
   // If there are multiple payment statuses, show Multiple statuses badge
   if (Array.isArray(uniqueStatuses) && uniqueStatuses.length > 1) {
-    paymentStatusChip =
+    paymentStatusChip = (
       <Grid item>
-        <OrderStatusChip displayStatus={i18next.t("data.status.multipleStatuses", "Multiple statuses")} status="multiple" type="payment" />
+        <OrderStatusChip
+          displayStatus={i18next.t("data.status.multipleStatuses", "Multiple statuses")}
+          status="multiple"
+          type="payment"
+        />
       </Grid>
-    ;
+    );
   } else {
     const [paymentStatus] = uniqueStatuses;
     // show badge only if paymentStatus !== created
     if (paymentStatus !== "created") {
-      paymentStatusChip =
+      paymentStatusChip = (
         <Grid item>
           <OrderStatusChip displayStatus={paymentStatus} status={paymentStatus} type="payment" />
         </Grid>
-      ;
+      );
     }
   }
 
@@ -59,7 +80,7 @@ function OrderHeader(props) {
         <Grid container alignItems="center" spacing={2}>
           <Grid item>
             <Typography variant="h3" className={classes.extraEmphasisText} display="inline">
-              {i18next.t("order.order", "Order")} - {referenceId}
+              {i18next.t("order.order", "Order")} # {orderId} - {getBranchName()}
             </Typography>
           </Grid>
           <Grid item>
@@ -67,10 +88,7 @@ function OrderHeader(props) {
           </Grid>
           {paymentStatusChip}
           <Grid item>
-            <Button
-              href={`/${currentShopId}/orders/print/${order.referenceId}`}
-              variant="text"
-            >
+            <Button href={`/${currentShopId}/orders/print/${order.referenceId}`} variant="text">
               {i18next.t("admin.orderWorkflow.invoice.printInvoice", "Print invoice")}
             </Button>
           </Grid>
@@ -82,7 +100,9 @@ function OrderHeader(props) {
         </Grid>
       </Grid>
       <Grid item xs={12}>
-        <Typography variant="body1" display="inline">{i18next.t("order.placed", "Placed")} {orderDate}</Typography>
+        <Typography variant="body1" display="inline">
+          {i18next.t("order.placed", "Placed")} {orderDate}
+        </Typography>
       </Grid>
     </Grid>
   );
@@ -94,12 +114,14 @@ OrderHeader.propTypes = {
   order: PropTypes.shape({
     createdAt: PropTypes.string,
     displayStatus: PropTypes.string,
-    payments: PropTypes.arrayOf(PropTypes.shape({
-      status: PropTypes.string.isRequired
-    })),
+    payments: PropTypes.arrayOf(
+      PropTypes.shape({
+        status: PropTypes.string.isRequired,
+      })
+    ),
     referenceId: PropTypes.string,
-    status: PropTypes.string
-  })
+    status: PropTypes.string,
+  }),
 };
 
 export default withMoment(withStyles(styles, { name: "RuiOrderHeader" })(OrderHeader));

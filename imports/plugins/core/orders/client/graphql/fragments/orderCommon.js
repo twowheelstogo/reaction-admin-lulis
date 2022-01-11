@@ -12,6 +12,7 @@ export const orderCommonFragment = gql`
     createdAt
     displayStatus(language: $language)
     email
+    orderId
     fulfillmentGroups {
       _id
       data {
@@ -21,11 +22,19 @@ export const orderCommonFragment = gql`
             description
             address
             reference
+            metaddress {
+              distance {
+                branch
+                branchId
+              }
+            }
           }
         }
         ... on PickupOrderFulfillmentGroupData {
           pickupDetails {
             datetime
+            branch
+            branchId
           }
         }
       }
