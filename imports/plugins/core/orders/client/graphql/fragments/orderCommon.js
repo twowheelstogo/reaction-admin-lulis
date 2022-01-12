@@ -224,6 +224,14 @@ export const orderCommonFragment = gql`
       country
       depto
     }
+    notes{
+      content
+    }
+    giftNote {
+      sender
+      receiver
+      message
+    }
     totalItemQuantity
     updatedAt
   }
