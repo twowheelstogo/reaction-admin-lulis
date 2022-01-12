@@ -306,7 +306,7 @@ function useDraftOrder(args = {}) {
                         cartId: cart._id || anonymousCartId,
                         cartItemIds: (Array.isArray(itemIds) && itemIds) || [itemIds],
                         cartToken: anonymousCartToken || null,
-                        accountId: selectedAccount._id || null
+                        accountId: selectedAccount?._id || null
                     }
                 },
                 update: (cache, { data: mutationData }) => {
@@ -333,7 +333,8 @@ function useDraftOrder(args = {}) {
 
             enqueueSnackbar("Producto removido", { variant: "success" });
         } catch (error) {
-
+            console.error(error.message);
+            enqueueSnackbar(error.message.replace("GraphQL error: ", ""), { variant: "error" });
         }
     }
     useEffect(() => {

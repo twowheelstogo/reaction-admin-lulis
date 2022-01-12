@@ -108,7 +108,6 @@ function NewOrder() {
         selectedProducts,
         handleAddItems: addItemsToCart,
         handleChangeItemQuantity: changeItemQuantity,
-        handleRemoveItem: removeItem,
         isLoadingProducts,
         query,
         cart,
