@@ -37,6 +37,16 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const mergeGroupItems = (groups) => {
+    let mergedList = [];
+
+    for (var group of groups) {
+        mergedList = [...mergedList, ...group.items];
+    }
+
+    return mergedList;
+}
+
 function SelectableProducts(props) {
     const classes = useStyles();
     const { products, checked, setChecked } = props;
@@ -204,7 +214,7 @@ function SelectableProducts(props) {
                         </ListItem>
                         {value.productType == "bundle" && (
                             <Collapse in={value._id == seeItems} timeout="auto" unmountOnExit>
-                                {renderBundleItems(value.productBundle?.items || [], value)}
+                                {renderBundleItems(mergeGroupItems(value.productBundle?.groups) || [], value)}
                             </Collapse>
                         )}
                         {value.variants.length > 1 && (

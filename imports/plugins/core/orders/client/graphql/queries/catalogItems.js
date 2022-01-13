@@ -29,6 +29,30 @@ query catalogItemsQuery($shopId: ID!, $tagIds: [ID] $first: ConnectionLimitInt, 
             tagIds
             productType
             productBundle {
+              groups {
+                items {
+                _id
+                description
+                slug
+                title
+                pageTitle
+                media {
+                  URLs {
+                    thumbnail
+                    small
+                    large
+                    medium
+                  }
+                }
+                variants{
+                  odooProduct
+                }
+                pricing{
+                  displayPrice
+                  price
+                }
+              }
+              }
               items {
                 _id
                 description
