@@ -242,6 +242,8 @@ function useDraftOrder(args = {}) {
         }
 
         try {
+            input.createCartInput.clientMutationId="";
+            console.log("input", input);
             await addOrCreateCartMutation({
                 variables: {
                     input
