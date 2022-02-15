@@ -71,14 +71,17 @@ function ProductsModal(props) {
 
 
     const cartItems = items.map((item) => {
+        const variant = item.selectedVariantId ? item.variants
+            .find((variant) => variant.variantId == item.selectedVariantId) : item.variants[0];
+
         const payload = {
             price: {
-                amount: item.variants[0].pricing[0].price,
+                amount: variant.pricing[0].price,
                 currencyCode: "GTQ"
             },
             productConfiguration: {
                 productId: item.productId,
-                productVariantId: item.variants[0].variantId
+                productVariantId: variant.variantId
             },
             quantity: 1
         };

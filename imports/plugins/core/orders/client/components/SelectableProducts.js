@@ -37,10 +37,21 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const mergeGroupItems = (groups) => {
+    let mergedList = [];
+
+    for (var group of groups) {
+        mergedList = [...mergedList, ...group.items];
+    }
+
+    return mergedList;
+}
+
 function SelectableProducts(props) {
     const classes = useStyles();
     const { products, checked, setChecked } = props;
-    const [seeItems, setSeeItems] = useState(false);
+    const [seeItems, setSeeItems] = useState(null);
+    const [seeVariants, setSeeVariants] = useState(null);
 
     const handleToggle = (value) => {
         const currentIndex = checked.findIndex((item) => item._id == value._id);
@@ -95,10 +106,10 @@ function SelectableProducts(props) {
                 const newItem = [...checked];
                 if (items.length > 0) {
                     newItem[currentIndex] = current;
-                }else {
+                } else {
                     newItem.splice(currentIndex, 1);
                 }
-                
+
                 setChecked(newItem);
             }
         }
@@ -124,16 +135,57 @@ function SelectableProducts(props) {
                 })}
             </List>
         );
-    }
+    };
+
+    const renderVariants = (items, currentItem) => {
+
+        return (
+            <List>
+                {items.map((variant) => {
+                    const labelId = `checkbox-list-secondary-label-${variant.variantId}`;
+                    const value = {
+                        ...currentItem,
+                        selectedVariantId: variant.variantId
+                    };
+
+                    const chkd = checked.find((item) => item._id == variant._id);
+
+                    const selected = chkd && chkd.selectedVariantId == variant.variantId;
+
+                    console.log("selected", selected);
+                    console.log(checked)
+
+                    return (<ListItem key={`${variant._id}`}>
+                        <ListItemAvatar className={classes.media}>
+                            <RenderMedia media={variant.media} />
+                        </ListItemAvatar>
+                        <ListItemText id={labelId} primary={variant.title} className={classes.text} />
+                        <ListItemSecondaryAction>
+                            <ItemContentQuantityInput>
+                                <Checkbox
+                                    edge="end"
+                                    // disabled={variant.added || variant.productType == "bundle"}
+                                    onChange={() => handleToggle(value)}
+                                    checked={selected}
+                                    inputProps={{ 'aria-labelledby': labelId }}
+                                />
+                            </ItemContentQuantityInput>
+                        </ListItemSecondaryAction>
+                    </ListItem>);
+                })}
+            </List>
+        )
+    };
 
     return (
         <List dense>
             {(products).map((value) => {
                 const labelId = `checkbox-list-secondary-label-${value}`;
+                console.log(value._id == seeItems);
 
                 return (
                     <div>
-                        <ListItem key={`${value._id}`} button onClick={value.productType != "bundle" ? () => handleToggle(value) : () => setSeeItems(!seeItems)}>
+                        <ListItem key={`${value._id}`} button onClick={value.productType != "bundle" && value.variants.length == 1 ? () => handleToggle(value) : () => setSeeItems(!seeItems ? value._id : null)}>
                             <ListItemAvatar className={classes.media}>
                                 {value.primaryImage
                                     ? <img
@@ -149,7 +201,7 @@ function SelectableProducts(props) {
                             </ListItemAvatar>
                             <ListItemText id={labelId} primary={value.title} secondary={value.productType == "bundle" && "Bundle"} className={classes.text} />
                             <ListItemSecondaryAction>
-                                {value.productType != "bundle"
+                                {value.productType != "bundle" && value.variants.length == 1
                                     ? <Checkbox
                                         edge="end"
                                         disabled={value.added || value.productType == "bundle"}
@@ -157,12 +209,17 @@ function SelectableProducts(props) {
                                         checked={checked.findIndex((item) => item._id == value._id) !== -1 || value.added}
                                         inputProps={{ 'aria-labelledby': labelId }}
                                     /> : <ListItemIcon
-                                        onClick={() => setSeeItems(!seeItems)}>{seeItems ? <ExpandLess /> : <ExpandMore />}</ListItemIcon>}
+                                        onClick={() => setSeeItems(!seeItems ? value._id : null)}>{value._id == seeItems ? <ExpandLess /> : <ExpandMore />}</ListItemIcon>}
                             </ListItemSecondaryAction>
                         </ListItem>
                         {value.productType == "bundle" && (
-                            <Collapse in={seeItems} timeout="auto" unmountOnExit>
-                                {renderBundleItems(value.productBundle?.items || [], value)}
+                            <Collapse in={value._id == seeItems} timeout="auto" unmountOnExit>
+                                {renderBundleItems(mergeGroupItems(value.productBundle?.groups) || [], value)}
+                            </Collapse>
+                        )}
+                        {value.variants.length > 1 && (
+                            <Collapse in={value._id == seeItems} timeout="auto" unmountOnExit>
+                                {renderVariants(value.variants, value)}
                             </Collapse>
                         )}
                         <Divider />

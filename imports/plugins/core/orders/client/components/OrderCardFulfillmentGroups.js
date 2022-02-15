@@ -146,6 +146,8 @@ class OrderCardFulfillmentGroups extends Component {
   renderUpdateFulfillmentGroupStatusButton = (fulfillmentGroup) => {
     const hasPermission = Reaction.hasPermission(["reaction:legacy:orders/update"], Reaction.getUserId(), Reaction.getShopId());
     const { order } = this.props;
+
+    console.log("order details", order);
     const canUpdateFulfillmentStatus = (fulfillmentGroup.status !== "coreOrderWorkflow/canceled");
 
     if (hasPermission && canUpdateFulfillmentStatus) {
@@ -257,6 +259,46 @@ class OrderCardFulfillmentGroups extends Component {
                         </Typography>
                         <OrderCardFulfillmentGroupTrackingNumber orderId={order._id} fulfillmentGroup={fulfillmentGroup} {...this.props} />
                       </Grid>
+                      {Array.isArray(order.notes) && order.notes.length > 0 && (
+                        <Grid item xs={12} md={12}>
+                          <Typography paragraph variant="h4">
+                            {"Observaciones"}
+                          </Typography>
+                          {order.notes.map((note) => (
+                            <Typography
+                              key={fulfillmentGroup._id}
+                              variant="body2"
+                            >
+                              {note.content} {/* eslint-disable-line */}
+                            </Typography>
+                          ))}
+                        </Grid>
+                      )}
+                      {order.giftNote && (
+                        <Grid item xs={12} md={12}>
+                          <Typography paragraph variant="h4">
+                            {"Mensaje de regalo"}
+                          </Typography>
+                          <Typography
+                            key={"sender"}
+                            variant="body2"
+                          >
+                            {"De: " + order.giftNote.sender} {/* eslint-disable-line */}
+                          </Typography>
+                          <Typography
+                            key={"receiver"}
+                            variant="body2"
+                          >
+                            {"Para: " + order.giftNote.receiver} {/* eslint-disable-line */}
+                          </Typography>
+                          <Typography
+                            key={"message"}
+                            variant="body2"
+                          >
+                            {order.giftNote.message} {/* eslint-disable-line */}
+                          </Typography>
+                        </Grid>
+                      )}
                     </Grid>
                   </Grid>
                 </Grid>
