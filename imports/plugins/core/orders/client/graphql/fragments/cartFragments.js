@@ -29,6 +29,8 @@ fragment CartCommon on Cart {
           description
           address
           reference
+          receiver
+          phone
           geolocation{
             latitude
             longitude
@@ -83,6 +85,8 @@ fragment CartCommon on Cart {
           description
           address
           reference
+          receiver
+          phone
           geolocation{
             latitude
             longitude

@@ -99,6 +99,20 @@ function CreateAddress(props) {
                         multiline
                         onChange={handleChange} />
                 </ColFull>
+                <ColFull>
+                    <TextField label="¿Quién recibe la orden?"
+                        placeholder="Escribe aquí"
+                        name="receiver"
+                        id="receiver"
+                        onChange={handleChange} />
+                </ColFull>
+                <ColFull>
+                    <TextField label="Teléfono de quien recibe"
+                        placeholder="Escribe aquí"
+                        name="phone"
+                        id="phone"
+                        onChange={handleChange} />
+                </ColFull>
             </Grid>
         );
     }

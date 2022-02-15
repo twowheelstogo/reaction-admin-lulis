@@ -527,6 +527,8 @@ function useDraftOrder(args = {}) {
         if (!input.description) throw new Error(`El campo "Descripción es requerido`);
         if (!input.address) throw new Error(`El campo "Dirección completa" es requerido`);
         if (!input.geolocation && !input.metaddress) throw new Error(`Es necesario que indiques una posición de entrega`);
+        if (!input.receiver) throw new Error(`Es necesario que indiques a quién se le entrega la orden`);
+        if (!input.phone) throw new Error(`Un número de teléfono es requerido`);
     }
 
     const handleAddAccountAddressBook = async (address) => {

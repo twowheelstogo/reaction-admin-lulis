@@ -30,6 +30,8 @@ mutation addAccountAddressBookEntryMutation($input: AddAccountAddressBookEntryIn
       description
       address
       reference
+      receiver
+      phone
       geolocation{
         latitude
         longitude

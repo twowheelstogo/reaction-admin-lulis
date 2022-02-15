@@ -20,6 +20,8 @@ export const OrderCommon = gql`
           address
           description
           reference
+          receiver
+          phone
           geolocation{
             latitude
             longitude
