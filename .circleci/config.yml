@@ -95,12 +95,12 @@ workflows:
   build_and_test:
     jobs:
       - install-dependencies
-      - dockerfile-lint:
-          requires:
-            - install-dependencies
-      - eslint:
-          requires:
-            - install-dependencies
+      # - dockerfile-lint:
+      #     requires:
+      #       - install-dependencies
+      # - eslint:
+      #     requires:
+      #       - install-dependencies
       - test-unit:
           requires:
             - install-dependencies
