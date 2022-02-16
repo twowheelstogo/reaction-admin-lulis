@@ -6,11 +6,16 @@ version: 2
 defaults: &defaults
   environment:
     CI_SCRIPTS: 'npx --quiet --package @reactioncommerce/ci-scripts@1.6.2'
-    DOCKER_REPOSITORY: "reactioncommerce/admin"
-    DOCKER_NAMESPACE: "reactioncommerce"
-    DOCKER_NAME: "admin"
+    DOCKER_REPOSITORY: "loginsolutions/reaction-admin-lulis"
+    DOCKER_NAMESPACE: "loginsolutions"
+    DOCKER_NAME: "reaction-admin-lulis"
   docker:
     - image: circleci/node:12.16.1-stretch
+only-deploy-trunk: &only-deploy-trunk
+  filters:
+    branches:
+      only:
+        - trunk
 
 jobs:
   install-dependencies:
@@ -75,10 +80,15 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          docker_layer_caching: true
+          docker_layer_caching: false
+          version: 19.03.13
       - run:
           name: Build and push production Docker image
-          command: ${CI_SCRIPTS} docker-build-tag-push . ${DOCKER_REPOSITORY}
+          command: |
+            VERSION=$(git describe --tags `git rev-list --tags --max-count=1` | cut -c2-100)
+            docker build -t ${DOCKER_REPOSITORY}:pre-launch . --network host
+            docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+            docker push ${DOCKER_REPOSITORY}:pre-launch
 
 workflows:
   version: 2
@@ -95,8 +105,9 @@ workflows:
           requires:
             - install-dependencies
       - docker-build-push:
-          context: reaction-publish-docker
-          requires:
-            - dockerfile-lint
-            - eslint
-            - test-unit
+          context: reaction-lulis-publish-docker
+          <<: *only-deploy-trunk
+          # requires:
+          #   - dockerfile-lint
+          #   - eslint
+          #   - test-unit
