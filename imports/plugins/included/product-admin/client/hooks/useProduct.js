@@ -180,6 +180,9 @@ function useProduct(args = {}) {
         }
       });
 
+      // Refetch on success to force a cache update
+      refetchProduct();
+
       enqueueSnackbar(i18next.t("productDetailEdit.updateProductFieldSuccess"), { variant: "success" });
     } catch (error) {
       enqueueSnackbar(i18next.t("productDetailEdit.updateProductFieldFail"), { variant: "error" });
@@ -188,7 +191,8 @@ function useProduct(args = {}) {
     enqueueSnackbar,
     product,
     shopId,
-    updateProduct
+    updateProduct,
+    refetchProduct
   ]);
 
   /**
@@ -214,6 +218,9 @@ function useProduct(args = {}) {
         }
       });
 
+      // Refetch on success to force a cache update
+      refetchProduct();
+
       enqueueSnackbar(i18next.t("productDetailEdit.updateProductFieldSuccess"), { variant: "success" });
     } catch (error) {
       enqueueSnackbar(i18next.t("productDetailEdit.updateProductFieldFail"), { variant: "error" });
@@ -222,7 +229,8 @@ function useProduct(args = {}) {
     enqueueSnackbar,
     product,
     shopId,
-    updateProduct
+    updateProduct,
+    refetchProduct
   ]);
 
   const handleDeleteProductTag = useCallback(async ({
@@ -248,6 +256,9 @@ function useProduct(args = {}) {
         }
       });
 
+      // Refetch on success to force a cache update
+      refetchProduct();
+
       enqueueSnackbar(i18next.t("productDetailEdit.removeProductTagSuccess"), { variant: "success" });
     } catch (error) {
       enqueueSnackbar(i18next.t("productDetailEdit.removeProductTagFail"), { variant: "error" });
@@ -256,7 +267,8 @@ function useProduct(args = {}) {
     enqueueSnackbar,
     product,
     shopId,
-    updateProduct
+    updateProduct,
+    refetchProduct
   ]);
 
 
@@ -276,11 +288,14 @@ function useProduct(args = {}) {
         }
       });
 
+      // Refetch on success to force a cache update
+      refetchProduct();
+
       enqueueSnackbar(i18next.t("productVariant.updateVariantSuccess"), { variant: "success" });
     } catch (error) {
       enqueueSnackbar(i18next.t("productVariant.updateVariantFail"), { variant: "error" });
     }
-  }, [enqueueSnackbar, shopId, updateProductVariant]);
+  }, [enqueueSnackbar, shopId, updateProductVariant, refetchProduct]);
 
   const onUpdateProductVariantPrices = useCallback(async ({
     variantPrices: variantPricesLocal,
@@ -302,11 +317,14 @@ function useProduct(args = {}) {
         }
       });
 
+      // Refetch on success to force a cache update
+      refetchProduct();
+
       enqueueSnackbar(i18next.t("productVariant.updateVariantPricesSuccess"), { variant: "success" });
     } catch (error) {
       enqueueSnackbar(i18next.t("productVariant.updateVariantPricesFail"), { variant: "error" });
     }
-  }, [enqueueSnackbar, shopId, updateProductVariantPrices]);
+  }, [enqueueSnackbar, shopId, updateProductVariantPrices, refetchProduct]);
 
   const onToggleVariantVisibility = useCallback(async ({
     variant: variantLocal,
@@ -325,11 +343,14 @@ function useProduct(args = {}) {
         }
       });
 
+      // Refetch on success to force a cache update
+      refetchProduct();
+
       enqueueSnackbar(i18next.t("productDetailEdit.updateProductFieldSuccess"), { variant: "success" });
     } catch (error) {
       enqueueSnackbar(i18next.t("productDetailEdit.updateProductFieldFail"), { variant: "error" });
     }
-  }, [enqueueSnackbar, shopId, updateProductVariant]);
+  }, [enqueueSnackbar, shopId, updateProductVariant, refetchProduct]);
 
   const onCloneProductVariants = useCallback(async ({
     variantIds: variantIdsLocal,
